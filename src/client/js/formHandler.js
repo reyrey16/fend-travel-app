@@ -20,18 +20,44 @@ const postToServer = async (url = '', data = {}) => {
 
 /* Function called by event listener */
 function processForm(e) {
-    const location = document.getElementById('location').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
+    const location = document.getElementById('location').value
+    let startDate = document.getElementById('startDate').value
+    let endDate = document.getElementById('endDate').value
+    let today = new Date()
+    let counterHolder = document.getElementById('counterHolder')
 
-    // validate that the input isn't blank
+    // validate that the inputs != blank
     if (location == "") {
-        document.getElementById('entryHolder').innerHTML = "Please enter a location"
+      counterHolder.innerHTML = "Please enter a location"
         return false
+    } else if (startDate == "") {
+      counterHolder.innerHTML = "Please enter a start date"
+      return false     
     }
+
+    // validate the start date is >= to today
+    if (Date.parse(startDate) < today) {
+      counterHolder.innerHTML = "Your start date has to be after today, please choose another start date"
+      return false
+    }
+
+    // date is good, continue processing form
+    startDate = startDate + "T00:00:00" // To ensure start date is at midnight
+    startDate = new Date(startDate)
+
+    let daysCounter = (Date.parse(startDate) - today) / 86400000 // amount of milliseconds in a day 
+    if (daysCounter < 1) {
+      counterHolder.innerHTML = parseInt(daysCounter / 3600000) + " hours left"  // amount of milliseconds in an hour
+    } else if (parseInt(daysCounter) == 1) {
+      counterHolder.innerHTML = parseInt(daysCounter) + " day left"
+    } else {
+      counterHolder.innerHTML = parseInt(daysCounter) + " days left"
+    }
+    console.log(daysCounter)
+    console.log(startDate)
   
     //FIRST: Get coordinates
-    document.getElementById('entryHolder').innerText = "Searching for exact location"
+    document.getElementById('locationHolder').innerHTML = "Searching for exact location"
     postToServer('/post-location', {location:location})
 
     // SECOND: Process results
@@ -50,7 +76,7 @@ function processForm(e) {
       else {
         results = "Sorry, I couldn't find that location. It must be so exclusive that I haven't heard about it. Please try another location"
       }
-      document.getElementById('entryHolder').innerHTML = JSON.stringify(results)
+      document.getElementById('locationHolder').innerHTML = JSON.stringify(results)
       console.log("GEONAMES RESULTS:", results)
     })
     
