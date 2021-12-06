@@ -1,3 +1,25 @@
+/* Function called by event listener */
+function generateEntry(e) {
+    const zip = document.getElementById('zip').value;
+    const feelings = document.getElementById('feelings').value;
+  
+    //FIRST: Get weather data
+    getWeather(baseURL, zip, apiKey)
+  
+    //SECOND: Post data to the server
+    .then((data) => {
+      postData('/', {temp:data.main.temp, date:newDate, feelings: feelings});
+    })
+  
+    .then(retrieveData);
+}
+
+// Event listener to add function to existing HTML DOM element
+export const btn = document.getElementById('generate')
+btn.addEventListener('click', generateEntry)
+
+export { generateEntry }
+
 /* Global Variables */
 let baseURL  = 'http://api.openweathermap.org/data/2.5/weather?zip=';
 const apiKey = '&appid=0a19a8d075a2222ed47edc7ea800379b&units=imperial';
@@ -6,24 +28,9 @@ const apiKey = '&appid=0a19a8d075a2222ed47edc7ea800379b&units=imperial';
 let d = new Date();
 let newDate = d.getMonth()+'.'+ d.getDate()+'.'+ d.getFullYear();
 
-// Event listener to add function to existing HTML DOM element
-document.getElementById('generate').addEventListener('click', generateEntry);
 
-/* Function called by event listener */
-function generateEntry(e) {
-  const zip = document.getElementById('zip').value;
-  const feelings = document.getElementById('feelings').value;
 
-  //FIRST: Get weather data
-  getWeather(baseURL, zip, apiKey)
 
-  //SECOND: Post data to the server
-  .then((data) => {
-    postData('/', {temp:data.main.temp, date:newDate, feelings: feelings});
-  })
-
-  .then(retrieveData);
-}
 
 /* Function to GET Web API Data*/
 const getWeather = async (baseURL, zip, apiKey) => {
