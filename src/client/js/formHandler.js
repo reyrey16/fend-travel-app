@@ -194,6 +194,7 @@ function processForm(e) {
           console.log("WITHIN A WEEK")
           getCurrentWeather(results)
         } else {
+          // If start date is after a week, call the historical Weather API
           console.log("AFTER A WEEK")
           getHistoricalWeather(results)
         }
