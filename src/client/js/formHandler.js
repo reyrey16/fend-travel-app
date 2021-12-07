@@ -58,6 +58,70 @@ function getCurrentWeather(location) {
   })
 }
 
+function getHistoricalWeather(location) {
+  document.getElementById('weatherHolder').innerHTML = "Searching for the historical weather"
+
+    // Manipulating the dates to go back a year
+    let start_date = new Date(location.start_date)
+    let newStartDate = start_date.setDate(start_date.getDate() - 365)
+    newStartDate = new Date(newStartDate).toISOString() // Convert to ISOString
+    newStartDate = newStartDate.split("T", 1)[0] // Grab the date only
+    let end_date = new Date(location.end_date)
+    let newEndDate =end_date.setDate(end_date.getDate() - 365)
+    newEndDate = new Date(newEndDate).toISOString() // Convert to ISOString
+    newEndDate = newEndDate.split("T", 1)[0] // Grab the date only
+
+  postToServer('/get-historical-weather', {
+      lat : location.lat,
+      lon : location.lon,
+      start_date : newStartDate,
+      end_date : newEndDate
+  })
+
+  // SECOND: Process results
+  .then((data) => {
+    console.log(data)
+    let results = {}
+    // If API call is successfull
+    console.log("WEATHERBIT DATA:",data)
+    //TO DO Calculate average temps by looping through array
+    console.log("Date array length:", data.data.length)
+    // If data.data exists, proper response is received from API
+    if (data.data) {
+      // Calculating average temps
+      let maxTemp = 0
+      let minTemp = 0
+      data.data.forEach((day, index, array) => {
+        console.log(day.max_temp,day.min_temp)
+        maxTemp += day.max_temp
+        minTemp += day.min_temp
+      })
+      let avgMaxTemp = maxTemp / data.data.length
+      let avgMinTemp = minTemp / data.data.length
+      results = {
+          temp : data.data[0].temp,
+          avg_max_temp : avgMaxTemp,
+          avg_min_temp : avgMinTemp
+      }
+      projectData.push(results)
+    }
+    else {
+      results = "Sorry, I couldn't find the weather for that location"
+    }
+    document.getElementById('weatherHolder').innerHTML = JSON.stringify(results)
+    console.log("WEATHERBIT RESULTS:", results)
+  })
+  
+  // IF IT ERRORS OUT: Catch the error here
+  .catch((e) => {
+    if (e.message.includes("NetworkError")) {
+      document.getElementById('entryHolder').innerHTML = "It seems you are not connected to the internet. Please check your internet connection and try again"
+    } else {
+      document.getElementById('entryHolder').innerHTML = e.message
+    }
+  })
+}
+
 /* Function called by event listener */
 function processForm(e) {
     const location = document.getElementById('location').value
@@ -118,8 +182,8 @@ function processForm(e) {
             lon : data.geonames[0].lng,
             lat : data.geonames[0].lat,
             country : data.geonames[0].countryName,
-            startDate : startDate,
-            endDate : endDate
+            start_date : startDate,
+            end_date : endDate
         }
         projectData.push({results})
         console.log("ProjectData:", projectData)
@@ -131,7 +195,7 @@ function processForm(e) {
           getCurrentWeather(results)
         } else {
           console.log("AFTER A WEEK")
-          getForecastWeather(results)
+          getHistoricalWeather(results)
         }
         
 

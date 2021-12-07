@@ -70,21 +70,49 @@ app.post('/get-current-weather', function (req, res) {
   let URL = baseURL + lat + lon + units + key
 
   // Call the WeatherBit Current API
-  getCurrentWeather(URL)
+  getWeather(URL)
+  .then((data) => {
+      res.send(data)
+  })
+})
+
+// Route for searching the historical weather in WeatherBit
+app.post('/get-historical-weather', function (req, res) {
+  // I am using the history instead of the forecast because I couldn't
+  // figure out with the API docs how to specify a specific date in the 
+  // future. I feel this way is more accurate.
+
+
+
+  console.log("START DATE:", req.body.start_date)
+  console.log("END DATE:", req.body.end_date)
+
+  // Preparing the URL for WeatherBit API
+  const baseURL = "https://api.weatherbit.io/v2.0/history/daily?"
+  let lat = "lat=" + req.body.lat
+  let lon = "&lon=" + req.body.lon
+  let units = "&units=I"
+  let start_date = "&start_date=" + req.body.start_date
+  let end_date = "&end_date=" + req.body.end_date
+  let key = "&key=" + process.env.WEATHERBIT_API_KEY
+  let URL = baseURL + lat + lon + units + start_date + end_date + key
+  
+  // Call the WeatherBit Current API
+  getWeather(URL)
   .then((data) => {
       res.send(data)
   })
 })
 
 // WeatherBit Current API function call
-const getCurrentWeather = async (URL) => {
+const getWeather = async (URL) => {
   const response = await fetch(URL)
   try {
-    console.log("===WeatherBit Current API call was successful===")
+    console.log("===WeatherBit API call was successful===")
     const data = await response.json()
     return data
   } catch (error) {
-    console.log("WeatherBit Current API Error:", error)
+    console.log("WeatherBit API Error:", error)
   }
 }
 
