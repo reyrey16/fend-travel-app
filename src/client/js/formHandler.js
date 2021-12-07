@@ -21,21 +21,25 @@ const postToServer = async (url = '', data = {}) => {
 }
 
 function getCurrentWeather(location) {
-  document.getElementById('weatherHolder').innerHTML = "Searching for the weather"
-  postToServer('/get-current-weather', {location:location})
+  document.getElementById('weatherHolder').innerHTML = "Searching for the current weather"
+  postToServer('/get-current-weather', {
+      lat : location.lat,
+      lon : location.lon
+  })
 
   // SECOND: Process results
   .then((data) => {
     console.log(data)
     let results = {}
     // If API call is successfull
-    if (data.totalResultsCount > 0) {
+    console.log("WEATHERBIT DATA:",data)
+    if (data.count > 0) {
       results = {
-          destination : data.geonames[0].name,
-          lon : data.geonames[0].lng,
-          lat : data.geonames[0].lat,
-          country : data.geonames[0].countryName
+          temp : data.data[0].temp,
+          weatherDesc : data.data[0].weather.description,
+          weatherIcon : data.data[0].weather.icon
       }
+      projectData.push(results)
     }
     else {
       results = "Sorry, I couldn't find the weather for that location"
@@ -60,6 +64,7 @@ function processForm(e) {
     let startDate = document.getElementById('startDate').value
     let startDateWithTime = new Date(startDate+"T00:00:00") // To ensure start date is at midnight
     let endDate = document.getElementById('endDate').value
+    let endDateWithTime = new Date(endDate+"T00:00:00") // To ensure start date is at midnight
     let today = new Date()
     let counterHolder = document.getElementById('counterHolder')
 
@@ -70,6 +75,9 @@ function processForm(e) {
     } else if (startDate == "") {
       counterHolder.innerHTML = "Please enter a start date"
       return false     
+    } else if (endDate == "") {
+      counterHolder.innerHTML = "Please enter an end date, sorry we can't vacation forever :)"
+      return false     
     }
 
     // validate the start date is >= to today
@@ -77,11 +85,12 @@ function processForm(e) {
       counterHolder.innerHTML = "Your start date has to be after today, please choose another start date"
       console.log("DATE DIFF:", (Date.parse(startDateWithTime) - today) / 86400000)
       return false
+    } else if (Date.parse(endDateWithTime) < Date.parse(startDateWithTime)) {
+      counterHolder.innerHTML = "Your end date can't be before your start date. I haven't figured out how to time travel"
+      return false
     }
 
     // date is good, continue processing form
-    
-
     let daysCounter = (Date.parse(startDateWithTime) - today) / 86400000 // amount of milliseconds in a day 
     if (daysCounter < 1) {
       counterHolder.innerHTML = parseInt(daysCounter / 3600000) + " hours left"  // amount of milliseconds in an hour
@@ -108,15 +117,24 @@ function processForm(e) {
             destination : data.geonames[0].name,
             lon : data.geonames[0].lng,
             lat : data.geonames[0].lat,
-            country : data.geonames[0].countryName
+            country : data.geonames[0].countryName,
+            startDate : startDate,
+            endDate : endDate
         }
-        projectData.push({
-          destination : data.geonames[0].name,
-          lon : data.geonames[0].lng,
-          lat : data.geonames[0].lat,
-          country : data.geonames[0].countryName
-        })
+        projectData.push({results})
         console.log("ProjectData:", projectData)
+        // Call to GeoNames was successfull, now let's get the weather
+        //FIRST: Check date
+        // If start date is within a week, call the Current Weather API 
+        if (daysCounter < 7) {
+          console.log("WITHIN A WEEK")
+          getCurrentWeather(results)
+        } else {
+          console.log("AFTER A WEEK")
+          getForecastWeather(results)
+        }
+        
+
       }
       else {
         results = "Sorry, I couldn't find that location. It must be so exclusive that I haven't heard about it. Please try another location"
@@ -133,15 +151,6 @@ function processForm(e) {
         document.getElementById('entryHolder').innerHTML = e.message
       }
     })
-
-    // Getting the weather data now
-    //FIRST: Check date
-    // If start date is within a week, call the Current Weather API 
-    if (daysCounter < 7) {
-      console.log("WITHIN A WEEK")
-    } else {
-      console.log("AFTER A WEEK")
-    }
 }
 
 // Event listener to add function to existing HTML DOM element

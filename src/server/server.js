@@ -31,7 +31,7 @@ const server = app.listen(port, () => {
   console.log("Server is alive!! Port " + port);
 });
 
-//
+// Route for searching the location in Geonames
 app.post('/post-location', function (req, res) {
   // Preparing the URL for GeoNames API
   const baseURL = "http://api.geonames.org/searchJSON?"
@@ -40,14 +40,11 @@ app.post('/post-location', function (req, res) {
   let username = "&username=" + process.env.GEO_NAMES_API_KEY
   let URL = baseURL + location + rows + username
 
-  console.log("URL = ", URL)
-
   // Call the GeoNames API
   getCoordinates(URL)
   .then((data) => {
       res.send(data)
   })
-
 })
 
 // GeoNames API function call
@@ -59,6 +56,35 @@ const getCoordinates = async (URL) => {
     return data
   } catch (error) {
     console.log("GeoNames API Error:", error)
+  }
+}
+
+// Route for searching the current weather in WeatherBit
+app.post('/get-current-weather', function (req, res) {
+  // Preparing the URL for WeatherBit API
+  const baseURL = "https://api.weatherbit.io/v2.0/current?"
+  let lat = "lat=" + req.body.lat
+  let lon = "&lon=" + req.body.lon
+  let units = "&units=I"
+  let key = "&key=" + process.env.WEATHERBIT_API_KEY
+  let URL = baseURL + lat + lon + units + key
+
+  // Call the WeatherBit Current API
+  getCurrentWeather(URL)
+  .then((data) => {
+      res.send(data)
+  })
+})
+
+// WeatherBit Current API function call
+const getCurrentWeather = async (URL) => {
+  const response = await fetch(URL)
+  try {
+    console.log("===WeatherBit Current API call was successful===")
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.log("WeatherBit Current API Error:", error)
   }
 }
 
