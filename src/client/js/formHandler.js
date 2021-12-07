@@ -122,6 +122,40 @@ function getHistoricalWeather(location) {
   })
 }
 
+function getPicture(location) {
+  document.getElementById('pictureHolder').alt = "Searching for a picture of the location"
+  console.log("LOCATION WITHIN GET PICTURE FUNCTION:", location)
+  postToServer('/get-picture', {location : location })
+
+  // SECOND: Process results
+  .then((data) => {
+    console.log(data)
+    let results = {}
+    // If API call is successfull
+    console.log("PIXABAY DATA:",data)
+    if (data.total > 0) {
+      results = {
+          webformatURL : data.hits[0].webformatURL
+      }
+      projectData.push(results)
+      document.getElementById('pictureHolder').src = results.webformatURL
+    } else {
+      document.getElementById('pictureHolder').src = ""
+      document.getElementById('pictureHolder').alt = "Sorry, I couldn't find a picture of that location"
+    }
+    console.log("PIXABAY RESULTS:", results)
+  })
+  
+  // IF IT ERRORS OUT: Catch the error here
+  .catch((e) => {
+    if (e.message.includes("NetworkError")) {
+      document.getElementById('entryHolder').innerHTML = "It seems you are not connected to the internet. Please check your internet connection and try again"
+    } else {
+      document.getElementById('entryHolder').innerHTML = e.message
+    }
+  })
+}
+
 /* Function called by event listener */
 function processForm(e) {
     const location = document.getElementById('location').value
@@ -159,9 +193,16 @@ function processForm(e) {
     if (daysCounter < 1) {
       counterHolder.innerHTML = parseInt(daysCounter / 3600000) + " hours left"  // amount of milliseconds in an hour
     } else if (parseInt(daysCounter) == 1) {
-      counterHolder.innerHTML = parseInt(daysCounter) + " day left"
+      counterHolder.innerHTML = parseInt(daysCounter) + " day left. "
     } else {
-      counterHolder.innerHTML = parseInt(daysCounter) + " days left"
+      counterHolder.innerHTML = parseInt(daysCounter) + " days left. "
+    }
+
+    let tripCounter = (Date.parse(endDateWithTime) - Date.parse(startDateWithTime)) / 86400000 // amount of milliseconds in a day
+    if (parseInt(tripCounter) == 1) {
+      document.getElementById('tripCounterHolder').innerHTML = "day trip"
+    } else {
+      document.getElementById('tripCounterHolder').innerHTML = parseInt(tripCounter) + " total days"
     }
     console.log("DAYS COUNTER:",daysCounter)
     console.log("START DATE:", startDate)
@@ -188,7 +229,8 @@ function processForm(e) {
         projectData.push({results})
         console.log("ProjectData:", projectData)
         // Call to GeoNames was successfull, now let's get the weather
-        //FIRST: Check date
+
+        //NEXT: Check date
         // If start date is within a week, call the Current Weather API 
         if (daysCounter < 7) {
           console.log("WITHIN A WEEK")
@@ -198,6 +240,10 @@ function processForm(e) {
           console.log("AFTER A WEEK")
           getHistoricalWeather(results)
         }
+
+        // Get picture from Pixabay
+        console.log("RESULTS FOR PIXABAY:",results)
+        getPicture(results.destination)
         
 
       }

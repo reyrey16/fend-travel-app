@@ -116,6 +116,37 @@ const getWeather = async (URL) => {
   }
 }
 
+// Route for searching a picture in Pixabay
+app.post('/get-picture', function (req, res) {
+  // Preparing the URL for Pixabay API
+  const baseURL = "https://pixabay.com/api/?"
+  let key = "key=" + process.env.PIXABAY_API_KEY
+  let safeSearch = "&safesearch=true"
+  let q = "&q=" + encodeURIComponent(req.body.location) // essential to ensure proper rendering
+  
+  let URL = baseURL + key + safeSearch + q
+
+  console.log("PIXABAY URL:", URL)
+
+  // Call the Pixabay API
+  getPicture(URL)
+  .then((data) => {
+      res.send(data)
+  })
+})
+
+// Pixabay API function call
+const getPicture = async (URL) => {
+  const response = await fetch(URL)
+  try {
+    console.log("===Pixabay API call was successful===")
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.log("Pixabay API Error:", error)
+  }
+}
+
 
 
 
