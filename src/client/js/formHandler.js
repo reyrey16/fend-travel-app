@@ -20,54 +20,6 @@ const postToServer = async (url = '', data = {}) => {
     }
 }
 
-async function getCoordinates(location) {
- //FIRST: Get coordinates
- document.getElementById('locationHolder').innerHTML = "Searching for exact location"
- postToServer('/post-location', {location:location})
-
- // SECOND: Process results
- .then((data) => {
-   console.log(data)
-   let results = {}
-   // If API call is successfull
-   if (data.totalResultsCount > 0) {
-     results = {
-         destination : data.geonames[0].name,
-         lon : data.geonames[0].lng,
-         lat : data.geonames[0].lat,
-         country : data.geonames[0].countryName,
-         start_date : startDate,
-         end_date : endDate
-     }
-     projectData = {
-       destination : data.geonames[0].name,
-       lon : data.geonames[0].lng,
-       lat : data.geonames[0].lat,
-       country : data.geonames[0].countryName,
-       start_date : startDate,
-       end_date : endDate
-     }
-     console.log("ProjectData:", projectData)
-    }
-    else {
-      results = "Sorry, I couldn't find that location. It must be so exclusive that I haven't heard about it. Please try another location"
-    }
-    document.getElementById('locationHolder').innerHTML = JSON.stringify(results)
-    console.log("GEONAMES RESULTS:", results)
-  })
-  
-  // IF IT ERRORS OUT: Catch the error here
-  .catch((e) => {
-    if (e.message.includes("NetworkError")) {
-      document.getElementById('entryHolder').innerHTML = "It seems you are not connected to the internet. Please check your internet connection and try again"
-    } else {
-      document.getElementById('entryHolder').innerHTML = e.message
-    }
-  })
-
-  return true
-}
-
 function processCoordinates(data) {
     // If API call is successfull
     if (data.totalResultsCount > 0) {
