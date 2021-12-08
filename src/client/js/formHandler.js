@@ -23,62 +23,39 @@ const postToServer = async (url = '', data = {}) => {
 function processCoordinates(data) {
     // If API call is successfull
     if (data.totalResultsCount > 0) {
-      projectData = {
-        destination : data.geonames[0].name,
-        lon : data.geonames[0].lng,
-        lat : data.geonames[0].lat,
-        country : data.geonames[0].countryName,
-      }
+      // Assigning values into the global projectData object
+      projectData.destination = data.geonames[0].name
+      projectData.lon = data.geonames[0].lng
+      projectData.lat = data.geonames[0].lat,
+      projectData.country = data.geonames[0].countryName,
+
       document.getElementById('locationHolder').innerHTML = JSON.stringify(projectData)
       console.log("ProjectData processCoordinates:", projectData)
       return true
-     }
-     else {
+     } else {
       document.getElementById('locationHolder').innerHTML = "Sorry, I couldn't find that location. It must be so exclusive that I haven't heard about it. Please try another location"
       projectData = {}
       console.log("ProjectData processCoordinates:", projectData)
       return false
     }
-   
  }
 
-function getCurrentWeather(location) {
-  document.getElementById('weatherHolder').innerHTML = "Searching for the current weather"
-  postToServer('/get-current-weather', {
-      lat : location.lat,
-      lon : location.lon
-  })
-
-  // SECOND: Process results
-  .then((data) => {
-    console.log(data)
-    let results = {}
+function processCurrentWeather(data) {
     // If API call is successfull
     console.log("WEATHERBIT DATA:",data)
     if (data.count > 0) {
-      results = {
-          temp : data.data[0].temp,
-          weatherDesc : data.data[0].weather.description,
-          weatherIcon : data.data[0].weather.icon
-      }
-      document.getElementById('currentWeatherIcon').src = "/images/" + results.weatherIcon + ".png"
-      projectData.push(results)
+      projectData.temp = data.data[0].temp
+      projectData.weatherDesc = data.data[0].weather.description
+      projectData.weatherIcon = data.data[0].weather.icon
+
+      document.getElementById('weatherHolder').innerHTML = JSON.stringify(projectData)
+      document.getElementById('currentWeatherIcon').src = "/images/" + projectData.weatherIcon + ".png"
+      return true
     }
     else {
-      results = "Sorry, I couldn't find the weather for that location"
+      document.getElementById('weatherHolder').innerHTML = "Sorry, I couldn't find the weather for that location"
+      return false
     }
-    document.getElementById('weatherHolder').innerHTML = JSON.stringify(results)
-    console.log("WEATHERBIT RESULTS:", results)
-  })
-  
-  // IF IT ERRORS OUT: Catch the error here
-  .catch((e) => {
-    if (e.message.includes("NetworkError")) {
-      document.getElementById('entryHolder').innerHTML = "It seems you are not connected to the internet. Please check your internet connection and try again"
-    } else {
-      document.getElementById('entryHolder').innerHTML = e.message
-    }
-  })
 }
 
 function getHistoricalWeather(location) {
@@ -234,39 +211,53 @@ function processForm(e) {
     console.log("DAYS COUNTER:",daysCounter)
     console.log("START DATE:", startDate)
     console.log("START DATE WITH TIME:",startDateWithTime)
+
+    projectData.start_date = startDate
+    projectData.end_date = endDate
+    projectData.daysCounter = daysCounter
   
         // MAIN LOGIC OF THE APP
         // 1. Get coordinates from GeoNames
         document.getElementById('locationHolder').innerHTML = "Searching for exact location"
         postToServer('/post-location', {location:location})
-        // Process GeoNames Response        
+        // Process GeoNames API response        
         .then((data) => {
           if(!processCoordinates(data)) {
             throw new Error("Couldn't find location")
           }
-          return true
         })
+
         // 2. Check date to determine correct weather API
-        .then((data) => {
-          console.log("2nd then: data=", data)
+        .then(() => {
+          // If start date is within a week, call the Current Weather API 
+          if (projectData.daysCounter < 7) {
+            document.getElementById('weatherHolder').innerHTML = "Searching for the current weather"
+            postToServer('/get-current-weather', {
+              lat : projectData.lat,
+              lon : projectData.lon
+            })
+            // Process current weather API response        
+            .then((data) => {
+              console.log("PROCESS WEATHER API:",data)
+              processCurrentWeather(data)
+            })
+          } else {
+            // If start date is after a week, call the historical Weather API
+            document.getElementById('weatherHolder').innerHTML = "Searching for the historical weather"
+          //  getHistoricalWeather(results)
+          }  
         })
+
+
         
+        // Catch any errors in the chain
         .catch((e) => {
           console.log("ERROR:", e)
         })
 
 
 
-        // //NEXT: Check date
-        // // If start date is within a week, call the Current Weather API 
-        // if (daysCounter < 7) {
-        //   console.log("WITHIN A WEEK")
-        //   getCurrentWeather(results)
-        // } else {
-        //   // If start date is after a week, call the historical Weather API
-        //   console.log("AFTER A WEEK")
-        //   getHistoricalWeather(results)
-        // }
+
 
         // // Get picture from Pixabay
         // console.log(projectData)
