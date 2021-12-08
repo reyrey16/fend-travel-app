@@ -104,48 +104,32 @@ function processHistoricalWeather(data) {
     }
 }
 
-function getPicture(location) {
-  document.getElementById('pictureHolder').alt = "Searching for a picture of the location"
-  console.log("LOCATION WITHIN GET PICTURE FUNCTION:", location)
-  postToServer('/get-picture', {location : location })
-
-  // SECOND: Process results
-  .then((data) => {
-    console.log(data)
-    let results = {}
-    // If API call is successfull
+function processPicture(data) {
+    // If API call is successful
     console.log("PIXABAY DATA:",data)
     if (data.total > 0) {
-      results = {
-          webformatURL : data.hits[0].webformatURL
-      }
-      projectData.push(results)
-      document.getElementById('pictureHolder').src = results.webformatURL
+      projectData.picture = data.hits[0].webformatURL
+      document.getElementById('pictureHolder').src = projectData.picture
+      return true
     } else {
       document.getElementById('pictureHolder').src = ""
-      //document.getElementById('pictureHolder').alt = "Sorry, I couldn't find a picture of that location"
+      //document.getElementById('pictureHolder').alt = "Sorry, I couldn't find a picture of the destination"
       return false // Couldn't find a location specific or country picture
-      
     }
-    console.log("PIXABAY RESULTS:", results)
-  })
-  
-  // IF IT ERRORS OUT: Catch the error here
-  .catch((e) => {
-    if (e.message.includes("NetworkError")) {
-      document.getElementById('entryHolder').innerHTML = "It seems you are not connected to the internet. Please check your internet connection and try again"
-    } else {
-      document.getElementById('entryHolder').innerHTML = e.message
-    }
-  })
-
-  return true
 }
 
 /* Function called by event listener */
 function processForm(e) {
+    //TO DO: Create a cleaner function
     projectData = {}
-    document.getElementById('currentWeatherIcon').src = ""
+    document.getElementById("locationHolder").innerHTML = ""
+    document.getElementById("counterHolder").innerHTML = ""
+    document.getElementById("weatherHolder").innerHTML = ""
+    document.getElementById("currentWeatherIcon").innerHTML = ""
+    document.getElementById("pictureHolder").src = ""
+    document.getElementById("pictureHolder").alt = ""
+    document.getElementById("currentWeatherIcon").src = ""
+    document.getElementById('pictureHolder').alt = ""
     let location = document.getElementById('location').value
     let startDate = document.getElementById('startDate').value
     let startDateWithTime = new Date(startDate+"T00:00:00") // To ensure start date is at midnight
@@ -154,6 +138,7 @@ function processForm(e) {
     let today = new Date()
     let counterHolder = document.getElementById('counterHolder')
 
+    // TO DO create a validation function
     // validate that the inputs != blank
     if (location == "") {
       counterHolder.innerHTML = "Please enter a location"
@@ -166,6 +151,7 @@ function processForm(e) {
       return false     
     }
 
+    // TO DO Create a date checker function
     // validate the start date is >= to today
     if (Date.parse(startDateWithTime) < today) {
       counterHolder.innerHTML = "Your start date has to be after today, please choose another start date"
@@ -186,6 +172,7 @@ function processForm(e) {
       counterHolder.innerHTML = parseInt(daysCounter) + " days left. "
     }
 
+    // TO DO Create a trip counter function
     let tripCounter = (Date.parse(endDateWithTime) - Date.parse(startDateWithTime)) / 86400000 // amount of milliseconds in a day
     if (parseInt(tripCounter) == 1) {
       document.getElementById('tripCounterHolder').innerHTML = "day trip"
@@ -225,6 +212,11 @@ function processForm(e) {
               console.log("PROCESS CURRENT WEATHER API:",data)
               processCurrentWeather(data)
             })
+
+            .catch((e) => {
+              console.log("ERROR:", e)
+            })
+
           } else {
             // If start date is after a week, call the historical Weather API
             document.getElementById('weatherHolder').innerHTML = "Searching for the historical weather"
@@ -242,37 +234,44 @@ function processForm(e) {
               console.log("PROCESS HISTORICAL WEATHER API:",data)
               processHistoricalWeather(data)
             })
+
+            .catch((e) => {
+              console.log("ERROR:", e)
+            })
           }  
         })
 
+        // 3. Get picture via Pixabay API
+        .then(() => {
+          document.getElementById('pictureHolder').alt = "Searching for a picture of the location"
+          postToServer('/get-picture', {location : projectData.destination})
 
-        
+          // Process Pixabay API response        
+          .then((data) => {
+            console.log("PROCESS PICTURE API:",data)
+            // If false, try country search
+            if (!processPicture(data)) {
+              postToServer('/get-picture', {location : projectData.country})
+              // Results of country picture search
+              .then((data) => {
+                console.log("PROCESS PICTURE API:",data)
+                processPicture(data)
+              })
+              .catch((e) => {
+                console.log("ERROR:", e)
+              })
+            }
+          })
+        })
+
         // Catch any errors in the chain
         .catch((e) => {
           console.log("ERROR:", e)
         })
-
-
-
-
-
-        // // Get picture from Pixabay
-        // console.log(projectData)
-        // console.log("RESULTS FOR PIXABAY:",results)
-        // // If it's false, I will try to get picture of the country
-        // if (!getPicture(results.destination)) {
-        //   getPicture(results.country)
-        // }
-
-
 }
 
 // Event listener to add function to existing HTML DOM element
 document.getElementById('generate').addEventListener('click', processForm)
-
-// Create a new date instance dynamically with JS
-let d = new Date();
-let newDate = d.getMonth()+'.'+ d.getDate()+'.'+ d.getFullYear();
 
 // EXPORTS
 export { processForm }
