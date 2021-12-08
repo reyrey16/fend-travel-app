@@ -1,4 +1,4 @@
-let projectData = []
+let projectData = {}
 
 /* POST data to the server side */
 const postToServer = async (url = '', data = {}) => {
@@ -20,6 +20,76 @@ const postToServer = async (url = '', data = {}) => {
     }
 }
 
+async function getCoordinates(location) {
+ //FIRST: Get coordinates
+ document.getElementById('locationHolder').innerHTML = "Searching for exact location"
+ postToServer('/post-location', {location:location})
+
+ // SECOND: Process results
+ .then((data) => {
+   console.log(data)
+   let results = {}
+   // If API call is successfull
+   if (data.totalResultsCount > 0) {
+     results = {
+         destination : data.geonames[0].name,
+         lon : data.geonames[0].lng,
+         lat : data.geonames[0].lat,
+         country : data.geonames[0].countryName,
+         start_date : startDate,
+         end_date : endDate
+     }
+     projectData = {
+       destination : data.geonames[0].name,
+       lon : data.geonames[0].lng,
+       lat : data.geonames[0].lat,
+       country : data.geonames[0].countryName,
+       start_date : startDate,
+       end_date : endDate
+     }
+     console.log("ProjectData:", projectData)
+    }
+    else {
+      results = "Sorry, I couldn't find that location. It must be so exclusive that I haven't heard about it. Please try another location"
+    }
+    document.getElementById('locationHolder').innerHTML = JSON.stringify(results)
+    console.log("GEONAMES RESULTS:", results)
+  })
+  
+  // IF IT ERRORS OUT: Catch the error here
+  .catch((e) => {
+    if (e.message.includes("NetworkError")) {
+      document.getElementById('entryHolder').innerHTML = "It seems you are not connected to the internet. Please check your internet connection and try again"
+    } else {
+      document.getElementById('entryHolder').innerHTML = e.message
+    }
+  })
+
+  return true
+}
+
+function processCoordinates(data) {
+    // If API call is successfull
+    if (data.totalResultsCount > 0) {
+      projectData = {
+        destination : data.geonames[0].name,
+        lon : data.geonames[0].lng,
+        lat : data.geonames[0].lat,
+        country : data.geonames[0].countryName,
+      }
+      document.getElementById('locationHolder').innerHTML = JSON.stringify(projectData)
+      console.log("ProjectData processCoordinates:", projectData)
+      return true
+     }
+     else {
+      document.getElementById('locationHolder').innerHTML = "Sorry, I couldn't find that location. It must be so exclusive that I haven't heard about it. Please try another location"
+      projectData = {}
+      console.log("ProjectData processCoordinates:", projectData)
+      return false
+    }
+   
+ }
+
 function getCurrentWeather(location) {
   document.getElementById('weatherHolder').innerHTML = "Searching for the current weather"
   postToServer('/get-current-weather', {
@@ -39,6 +109,7 @@ function getCurrentWeather(location) {
           weatherDesc : data.data[0].weather.description,
           weatherIcon : data.data[0].weather.icon
       }
+      document.getElementById('currentWeatherIcon').src = "/images/" + results.weatherIcon + ".png"
       projectData.push(results)
     }
     else {
@@ -141,7 +212,9 @@ function getPicture(location) {
       document.getElementById('pictureHolder').src = results.webformatURL
     } else {
       document.getElementById('pictureHolder').src = ""
-      document.getElementById('pictureHolder').alt = "Sorry, I couldn't find a picture of that location"
+      //document.getElementById('pictureHolder').alt = "Sorry, I couldn't find a picture of that location"
+      return false // Couldn't find a location specific or country picture
+      
     }
     console.log("PIXABAY RESULTS:", results)
   })
@@ -154,6 +227,8 @@ function getPicture(location) {
       document.getElementById('entryHolder').innerHTML = e.message
     }
   })
+
+  return true
 }
 
 /* Function called by event listener */
@@ -208,60 +283,33 @@ function processForm(e) {
     console.log("START DATE:", startDate)
     console.log("START DATE WITH TIME:",startDateWithTime)
   
-    //FIRST: Get coordinates
-    document.getElementById('locationHolder').innerHTML = "Searching for exact location"
-    postToServer('/post-location', {location:location})
 
-    // SECOND: Process results
-    .then((data) => {
-      console.log(data)
-      let results = {}
-      // If API call is successfull
-      if (data.totalResultsCount > 0) {
-        results = {
-            destination : data.geonames[0].name,
-            lon : data.geonames[0].lng,
-            lat : data.geonames[0].lat,
-            country : data.geonames[0].countryName,
-            start_date : startDate,
-            end_date : endDate
-        }
-        projectData.push({results})
-        console.log("ProjectData:", projectData)
-        // Call to GeoNames was successfull, now let's get the weather
+        // 1. Get coordinates from GeoNames
+        document.getElementById('locationHolder').innerHTML = "Searching for exact location"
+        postToServer('/post-location', {location:location})
+        // Process GeoNames Response        
+        .then((data) => {processCoordinates(data)})
 
-        //NEXT: Check date
-        // If start date is within a week, call the Current Weather API 
-        if (daysCounter < 7) {
-          console.log("WITHIN A WEEK")
-          getCurrentWeather(results)
-        } else {
-          // If start date is after a week, call the historical Weather API
-          console.log("AFTER A WEEK")
-          getHistoricalWeather(results)
-        }
+        // //NEXT: Check date
+        // // If start date is within a week, call the Current Weather API 
+        // if (daysCounter < 7) {
+        //   console.log("WITHIN A WEEK")
+        //   getCurrentWeather(results)
+        // } else {
+        //   // If start date is after a week, call the historical Weather API
+        //   console.log("AFTER A WEEK")
+        //   getHistoricalWeather(results)
+        // }
 
-        // Get picture from Pixabay
-        console.log("RESULTS FOR PIXABAY:",results)
-        getPicture(results.destination)
-        
+        // // Get picture from Pixabay
+        // console.log(projectData)
+        // console.log("RESULTS FOR PIXABAY:",results)
+        // // If it's false, I will try to get picture of the country
+        // if (!getPicture(results.destination)) {
+        //   getPicture(results.country)
+        // }
 
-      }
-      else {
-        results = "Sorry, I couldn't find that location. It must be so exclusive that I haven't heard about it. Please try another location"
-      }
-      document.getElementById('locationHolder').innerHTML = JSON.stringify(results)
-      console.log("GEONAMES RESULTS:", results)
-    })
-    
-    // IF IT ERRORS OUT: Catch the error here
-    .catch((e) => {
-      if (e.message.includes("NetworkError")) {
-        document.getElementById('entryHolder').innerHTML = "It seems you are not connected to the internet. Please check your internet connection and try again"
-      } else {
-        document.getElementById('entryHolder').innerHTML = e.message
-      }
-    })
+
 }
 
 // Event listener to add function to existing HTML DOM element
