@@ -51,7 +51,7 @@ app.post('/post-location', function (req, res) {
 const getCoordinates = async (URL) => {
   const response = await fetch(URL)
   try {
-    console.log("===geoNames API call was successful===")
+    console.log("=== geoNames API call was successful ===")
     const data = await response.json()
     return data
   } catch (error) {
@@ -108,7 +108,7 @@ app.post('/get-historical-weather', function (req, res) {
 const getWeather = async (URL) => {
   const response = await fetch(URL)
   try {
-    console.log("===WeatherBit API call was successful===")
+    console.log("=== WeatherBit API call was successful ===")
     const data = await response.json()
     return data
   } catch (error) {
@@ -126,6 +126,8 @@ app.post('/get-picture', function (req, res) {
   
   let URL = baseURL + key + safeSearch + q
 
+  // Leaving this here to make it easier to validate the country 
+  // logic works
   console.log("PIXABAY URL:", URL)
 
   // Call the Pixabay API
@@ -139,44 +141,10 @@ app.post('/get-picture', function (req, res) {
 const getPicture = async (URL) => {
   const response = await fetch(URL)
   try {
-    console.log("===Pixabay API call was successful===")
+    console.log("=== Pixabay API call was successful ===")
     const data = await response.json()
     return data
   } catch (error) {
     console.log("Pixabay API Error:", error)
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // Initialize all route with a callback function
-// app.get('/all', (request, response) => {
-//   response.send(projectData);
-//   console.log("GET request completed");
-// });
-
-// app.post('/', postEntry);
-
-// function postEntry (request, response) {
-//   newData = request.body;
-//   projectData = {
-//     temp : newData.temp,
-//     date : newData.date,
-//     feelings : newData.feelings
-//   }
-//   console.log("POST request completed");
-// }
