@@ -46,10 +46,10 @@ function processCurrentWeather(data) {
     if (data.count > 0) {
       projectData.temp = data.data[0].temp
       projectData.weatherDesc = data.data[0].weather.description
-      projectData.weatherIcon = data.data[0].weather.icon
+      projectData.weatherIcon = "/images/" + data.data[0].weather.icon + ".png"
 
       document.getElementById('weatherHolder').innerHTML = JSON.stringify(projectData)
-      document.getElementById('currentWeatherIcon').src = "/images/" + projectData.weatherIcon + ".png"
+      document.getElementById('currentWeatherIcon').src = projectData.weatherIcon
       return true
     }
     else {
@@ -58,34 +58,27 @@ function processCurrentWeather(data) {
     }
 }
 
-function getHistoricalWeather(location) {
-  document.getElementById('weatherHolder').innerHTML = "Searching for the historical weather"
-
+function goBackAYear(start_date, end_date) {
     // Manipulating the dates to go back a year
-    let start_date = new Date(location.start_date)
-    let newStartDate = start_date.setDate(start_date.getDate() - 365)
-    newStartDate = new Date(newStartDate).toISOString() // Convert to ISOString
-    newStartDate = newStartDate.split("T", 1)[0] // Grab the date only
-    let end_date = new Date(location.end_date)
-    let newEndDate =end_date.setDate(end_date.getDate() - 365)
-    newEndDate = new Date(newEndDate).toISOString() // Convert to ISOString
-    newEndDate = newEndDate.split("T", 1)[0] // Grab the date only
+    let startDate    = new Date(start_date)
+    let newStartDate = startDate.setDate(startDate.getDate() - 365)
+    newStartDate     = new Date(newStartDate).toISOString() // Convert to ISOString
+    newStartDate     = newStartDate.split("T", 1)[0] // Grab the date only
 
-  postToServer('/get-historical-weather', {
-      lat : location.lat,
-      lon : location.lon,
-      start_date : newStartDate,
-      end_date : newEndDate
-  })
+    let endDate    = new Date(end_date)
+    let newEndDate = endDate.setDate(endDate.getDate() - 365)
+    newEndDate     = new Date(newEndDate).toISOString() // Convert to ISOString
+    newEndDate     = newEndDate.split("T", 1)[0] // Grab the date only
 
-  // SECOND: Process results
-  .then((data) => {
-    console.log(data)
-    let results = {}
+    return {start_date: newStartDate, end_date: newEndDate}
+}
+
+function processHistoricalWeather(data) {
     // If API call is successfull
     console.log("WEATHERBIT DATA:",data)
-    //TO DO Calculate average temps by looping through array
+
     console.log("Date array length:", data.data.length)
+
     // If data.data exists, proper response is received from API
     if (data.data) {
       // Calculating average temps
@@ -98,28 +91,17 @@ function getHistoricalWeather(location) {
       })
       let avgMaxTemp = maxTemp / data.data.length
       let avgMinTemp = minTemp / data.data.length
-      results = {
-          temp : data.data[0].temp,
-          avg_max_temp : avgMaxTemp,
-          avg_min_temp : avgMinTemp
-      }
-      projectData.push(results)
+
+      projectData.temp = data.data[0].temp
+      projectData.avg_max_temp = avgMaxTemp
+      projectData.avg_min_temp = avgMinTemp
+      
+      document.getElementById('weatherHolder').innerHTML = JSON.stringify(projectData)
+      return true
+    }  else {
+      document.getElementById('weatherHolder').innerHTML = "Sorry, I couldn't find the weather for that location"
+      return false
     }
-    else {
-      results = "Sorry, I couldn't find the weather for that location"
-    }
-    document.getElementById('weatherHolder').innerHTML = JSON.stringify(results)
-    console.log("WEATHERBIT RESULTS:", results)
-  })
-  
-  // IF IT ERRORS OUT: Catch the error here
-  .catch((e) => {
-    if (e.message.includes("NetworkError")) {
-      document.getElementById('entryHolder').innerHTML = "It seems you are not connected to the internet. Please check your internet connection and try again"
-    } else {
-      document.getElementById('entryHolder').innerHTML = e.message
-    }
-  })
 }
 
 function getPicture(location) {
@@ -162,6 +144,8 @@ function getPicture(location) {
 
 /* Function called by event listener */
 function processForm(e) {
+    projectData = {}
+    document.getElementById('currentWeatherIcon').src = ""
     let location = document.getElementById('location').value
     let startDate = document.getElementById('startDate').value
     let startDateWithTime = new Date(startDate+"T00:00:00") // To ensure start date is at midnight
@@ -238,13 +222,26 @@ function processForm(e) {
             })
             // Process current weather API response        
             .then((data) => {
-              console.log("PROCESS WEATHER API:",data)
+              console.log("PROCESS CURRENT WEATHER API:",data)
               processCurrentWeather(data)
             })
           } else {
             // If start date is after a week, call the historical Weather API
             document.getElementById('weatherHolder').innerHTML = "Searching for the historical weather"
-          //  getHistoricalWeather(results)
+            // Generate new dates since the API relies on previous dates 
+            let newDates = goBackAYear(projectData.start_date, projectData.end_date)
+            console.log("New Dates:", newDates)
+            postToServer('/get-historical-weather', {
+              lat : projectData.lat,
+              lon : projectData.lon,
+              start_date : newDates.start_date,
+              end_date : newDates.end_date
+            })
+            // Process historical weather API response        
+            .then((data) => {
+              console.log("PROCESS HISTORICAL WEATHER API:",data)
+              processHistoricalWeather(data)
+            })
           }  
         })
 
