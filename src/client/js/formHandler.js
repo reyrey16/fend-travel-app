@@ -185,7 +185,7 @@ function getPicture(location) {
 
 /* Function called by event listener */
 function processForm(e) {
-    const location = document.getElementById('location').value
+    let location = document.getElementById('location').value
     let startDate = document.getElementById('startDate').value
     let startDateWithTime = new Date(startDate+"T00:00:00") // To ensure start date is at midnight
     let endDate = document.getElementById('endDate').value
@@ -235,12 +235,27 @@ function processForm(e) {
     console.log("START DATE:", startDate)
     console.log("START DATE WITH TIME:",startDateWithTime)
   
-
+        // MAIN LOGIC OF THE APP
         // 1. Get coordinates from GeoNames
         document.getElementById('locationHolder').innerHTML = "Searching for exact location"
         postToServer('/post-location', {location:location})
         // Process GeoNames Response        
-        .then((data) => {processCoordinates(data)})
+        .then((data) => {
+          if(!processCoordinates(data)) {
+            throw new Error("Couldn't find location")
+          }
+          return true
+        })
+        // 2. Check date to determine correct weather API
+        .then((data) => {
+          console.log("2nd then: data=", data)
+        })
+        
+        .catch((e) => {
+          console.log("ERROR:", e)
+        })
+
+
 
         // //NEXT: Check date
         // // If start date is within a week, call the Current Weather API 
