@@ -11,16 +11,20 @@
   <div class="holder headline">
     <h1>Travel Planner</h1>
   </div>
-  <div class="holder">
-    <label for="location">Destination:</label>
+  <div class="holder form">
+    <label for="location">Destination</label>
     <input type="text" id="location" placeholder="enter city" required>
-  </div>
-  <div class="holder">
-    <label for="startDate">Start Date</label>
-    <input type="date" id="startDate" required>
-    <label for="startDate">End Date</label>
-    <input type="date" id="endDate" required>
-    <button id="generate" type="submit">SUBMIT</button>
+    <div class="dates">
+      <div>
+        <label for="startDate">Start date</label>
+        <input type="date" id="startDate" required>
+      </div>
+      <div>
+        <label for="endDate">End date</label>
+        <input type="date" id="endDate" required>
+      </div>
+    </div>
+    <button id="generate" class="btn-blue btn" type="submit">SUBMIT</button>
   </div>
   <div class="holder entry">
     <div class="title">TRAVEL PLANS</div>

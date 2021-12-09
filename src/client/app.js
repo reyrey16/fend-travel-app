@@ -12,6 +12,7 @@ export { processCoordinates, processCurrentWeather, processHistoricalWeather, pr
 import './styles/base.scss'
 import './styles/resets.scss'
 import './styles/header.scss'
+import './styles/form.scss'
 
 // Importing the images
 import './media/weather-icons/a01d.png'

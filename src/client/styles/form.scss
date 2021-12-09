@@ -1,0 +1,58 @@
+@import 'base';
+
+.form {
+  grid-area: main;
+  font-size: 1.5em;
+  margin: 20px;
+
+  
+
+  .dates {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-items: stretch;
+  }
+
+  label {
+    margin: 10px 0;
+    display: block;
+  }
+
+  input {
+    display: block;
+    width: 100%;
+    font-family: $primaryFont;
+    height: 35px;
+    margin: 10px 0;
+    font-size: 15px;
+  }
+
+  @mixin button-bg($bg) {
+    background: $bg;
+    &:hover {
+      background:darken($bg,8%);
+      transition: all 0.3s ease;
+    }
+    &:active {
+      background:darken($bg,25%);
+    } 
+  }
+  
+  .btn {
+   color:white;
+   text-decoration:none;
+   padding:5px 10px;
+   border-radius:3px;
+   width: 100%;
+
+   font-size: 1em;
+  }
+
+  .btn-blue {
+    @include button-bg($marigold);
+ }
+ 
+
+
+}
