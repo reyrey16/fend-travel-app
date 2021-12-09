@@ -2,105 +2,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&family=Poppins&display=swap');
 
 body{
-    background: #f23557;
     font-family: 'Poppins', sans-serif;
     margin: 0;
 }
 
 #app{
     display: grid;
-    grid-auto-rows: 150px 150px 400px 1fr;
-    /* grid-template-columns:  */
-    height:100vh;
-    color: #f0d43a;
-    grid-gap: 1em;
     font-size: 25px;
     margin: 0 5%;
-}
-
-.holder{
-  margin: 10px 0;
-}
-
-.entry{
-    background: rgba(59, 74, 107, .4);
-    font-size: 1.5em;
-    height: 500px;
-    margin: 25px 0;
-    padding: 10px;
-}
-
-.headline {
-  font-family: 'Dancing Script', cursive;
-  text-align: center;
-  font-size: 1.5em;
-}
-.title{
-  font-family: 'Dancing Script', cursive;
-}
-
-/*  Basic Styling To Override Default For Basic HTML Elements */
-label{
-    display:block;
-    font-size: 2em;
-}
-
-input{
-    display:block;
-    height: 75px;
-    width: 320px;
-    background:#22b2da;
-    color: #f0d43a;
-    border: none;
-    font-size: 1.5em;
-}
-
-button{
-    display:block;
-    width: 400px;
-    height: 100px;
-    background: #3b4a6b;
-    color: #f0d43a;
-    border: none;
-    box-shadow: 2px 4px 5px #444;
-    font-size: 2em;
-    margin: 15px auto;
-}
-
-textarea{
-    box-sizing: border-box;
-    width: 100%;
-    height: 200px;
-    font-size: 1.5em;
-    background:#22b2da;
-    color: #f0d43a;
-}
-/* Reset style for HTML element on active to have no border*/
-input:focus,
-select:focus,
-textarea:focus,
-button:focus {
-    outline: none;
-}
-/* Style for Placeholder Text*/
-::placeholder { /* Firefox, Chrome, Opera */
-    color: #f0d43a;
-    font-family: 'Poppins', sans-serif;
-}
-
-:-ms-input-placeholder { /* Internet Explorer 10-11 */
-    color: #f0d43a;
-    font-family: 'Poppins', sans-serif;
-}
-
-::-ms-input-placeholder { /* Microsoft Edge */
-    color: #f0d43a;
-    font-family: 'Poppins', sans-serif;
-}
-
-/* MEDIA QUERIES */
-@media(min-width: 600px) {
-  #app{
-      height:auto;
-  }
 }

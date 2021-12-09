@@ -13,7 +13,6 @@ export function processCoordinates(data) {
     Client.projectData.lon = data.geonames[0].lng
     Client.projectData.lat = data.geonames[0].lat
     Client.projectData.country = data.geonames[0].countryName
-    document.getElementById('locationHolder').innerHTML = Client.projectData.destination
     return true
    } else {
     document.getElementById('locationHolder').innerHTML = "Sorry, I couldn't find that location. It must be so exclusive that I haven't heard about it. Please try another location"

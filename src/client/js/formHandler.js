@@ -43,22 +43,26 @@ function displayTripCounter(tripCounter) {
 }
 
 function displayResults(data) {
+  // Display the destination
+  document.getElementById('locationHolder').innerHTML = data.destination
+  
+  // Display the counters
   displayDaysCounter(data.daysCounter)
   displayTripCounter(data.tripCounter)
 
   // Display the weather
   if (data.weatherType == "current") {
-    document.getElementById('currentWeatherIcon').src = Client.projectData.weatherIcon
-    document.getElementById('weatherHolder').innerHTML = `Current weather: ${Client.projectData.temp}&deg; F <br> ${Client.projectData.weatherDesc}`
+    document.getElementById('currentWeatherIcon').src = data.weatherIcon
+    document.getElementById('weatherHolder').innerHTML = `Current weather: ${data.temp}&deg; F <br> ${data.weatherDesc}`
   } 
 
   else if (data.weatherType == "historical") {
-    document.getElementById('weatherHolder').innerHTML = `Typical weather for then is:<br> ${parseInt(Client.projectData.avgMaxTemp)}&deg; F, ${parseInt(Client.projectData.avgMinTemp)}&deg; F`
+    document.getElementById('weatherHolder').innerHTML = `Typical weather for then is:<br> ${parseInt(data.avgMaxTemp)}&deg; F, ${parseInt(data.avgMinTemp)}&deg; F`
   }
 
   // Display the picture
   if(data.picture) {
-    document.getElementById('pictureHolder').src = Client.projectData.picture
+    document.getElementById('pictureHolder').src = data.picture
   }
 
   console.log(data)
@@ -196,19 +200,21 @@ export function processForm(e) {
 document.getElementById('generate').addEventListener('click', processForm)
 
   // TEST DATA FOR MAKING IT PRETTY
-  // // Client.projectData = { 
-  // //   "start_date": "2022-01-04", 
-  // //   "end_date": "2022-01-12", 
-  // //   "daysCounter": 25.652029525462964, 
-  // //   "tripCounter": 8, 
-  // //   "destination": "Walt Disney World", 
-  // "weatherType": "historical"
-  // //   "lon": "-81.58257", 
-  // //   "lat": "28.41167", 
-  // //   "country": "United States", 
-  // //   "temp": 56.1, 
-  // //   "avgMaxTemp": 65.9875,
-  // //   "avgMinTemp": 41.1875,
-  // //   "picture": "https://pixabay.com/get/gbcdd93b049c34cc71c47a0729a5d302e13a…d1048dc48f9aead4ff910fb3653c430f124fd20d32d7a49509c8_640.jpg",
-  // //   "temp": 56.1
-  // // }
+   let testData = { 
+     "start_date": "2022-01-04", 
+   "end_date": "2022-01-12", 
+   "daysCounter": 25.652029525462964, 
+   "tripCounter": 8, 
+     "destination": "Walt Disney World", 
+  "weatherType": "historical",
+     "lon": "-81.58257", 
+     "lat": "28.41167", 
+     "country": "United States", 
+     "temp": 56.1, 
+     "avgMaxTemp": 65.9875,
+     "avgMinTemp": 41.1875,
+     "picture": "https://cdn.pixabay.com/photo/2016/11/20/09/12/architecture-1842324_960_720.jpg",
+     "temp": 56.1
+   }
+
+   displayResults(testData)
