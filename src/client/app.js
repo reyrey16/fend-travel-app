@@ -1,12 +1,12 @@
 // Importing functions
 import { processForm } from './js/formHandler'
-import { cleanAllFields, validateInput, validateDates } from './js/validators'
-import { processCoordinates, processCurrentWeather, processHistoricalWeather, processPicture } from './js/processAPI'
+import { cleanAllFields, validateInput, validateDates, createDaysCounter, createTripCounter } from './js/validators'
+import { processCoordinates, processCurrentWeather, processHistoricalWeather, processPicture, goBackAYear } from './js/processAPI'
 
 // Exporting so we can access via Client.NAME
 export { processForm }
-export { cleanAllFields, validateInput, validateDates }
-export { processCoordinates, processCurrentWeather, processHistoricalWeather, processPicture }
+export { cleanAllFields, validateInput, validateDates, createDaysCounter, createTripCounter }
+export { processCoordinates, processCurrentWeather, processHistoricalWeather, processPicture, goBackAYear }
 
 // Importing styles
 import './styles/base.scss'

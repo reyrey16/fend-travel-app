@@ -1,3 +1,4 @@
+// Global variable where all the data is stored for the trip
 export let projectData = {}
 
 /* POST data to the server side */
@@ -20,26 +21,7 @@ const postToServer = async (url = '', data = {}) => {
     }
 }
 
-function goBackAYear(start_date, end_date) {
-    // Manipulating the dates to go back a year
-    let startDate    = new Date(start_date)
-    let newStartDate = startDate.setDate(startDate.getDate() - 365)
-    newStartDate     = new Date(newStartDate).toISOString() // Convert to ISOString
-    newStartDate     = newStartDate.split("T", 1)[0] // Grab the date only
-
-    let endDate    = new Date(end_date)
-    let newEndDate = endDate.setDate(endDate.getDate() - 365)
-    newEndDate     = new Date(newEndDate).toISOString() // Convert to ISOString
-    newEndDate     = newEndDate.split("T", 1)[0] // Grab the date only
-
-    return {start_date: newStartDate, end_date: newEndDate}
-}
-
-function displayResults(data) {
-  displayDaysCounter(data.daysCounter)
-  displayTripCounter(data.tripCounter)
-}
-
+// Helper functions to display the output
 function displayDaysCounter(daysCounter) {
   let counterHolder = document.getElementById('counterHolder')
 
@@ -60,20 +42,9 @@ function displayTripCounter(tripCounter) {
   }
 }
 
-function createDaysCounter(startDate) {
-  let startDateWithTime = new Date(startDate+"T00:00:00") // To ensure start date is at midnight
-  let today = new Date()
-  let daysCounter = (Date.parse(startDateWithTime) - today) / 86400000 // amount of milliseconds in a day
-  
-  return daysCounter
-}
-
-function createTripCounter(startDate, endDate) {
-  let startDateWithTime = new Date(startDate+"T00:00:00") // To ensure start date is at midnight
-  let endDateWithTime = new Date(endDate+"T00:00:00") // To ensure start date is at midnight
-  let tripCounter = (Date.parse(endDateWithTime) - Date.parse(startDateWithTime)) / 86400000 // amount of milliseconds in a day
-
-  return tripCounter
+function displayResults(data) {
+  displayDaysCounter(data.daysCounter)
+  displayTripCounter(data.tripCounter)
 }
 
 /* Function called by event listener */
@@ -94,8 +65,8 @@ export function processForm(e) {
     // TO DO : probably will go at the end with buildUI
     Client.projectData.start_date = startDate
     Client.projectData.end_date = endDate
-    Client.projectData.daysCounter = createDaysCounter(startDate)
-    Client.projectData.tripCounter = createTripCounter(startDate, endDate)
+    Client.projectData.daysCounter = Client.createDaysCounter(startDate)
+    Client.projectData.tripCounter = Client.createTripCounter(startDate, endDate)
   } else {
     return false
   }
@@ -140,7 +111,7 @@ export function processForm(e) {
         // If start date is after a week, call the historical Weather API
         document.getElementById('weatherHolder').innerHTML = "Searching for the historical weather"
         // Generate new dates since the API relies on previous dates 
-        let newDates = goBackAYear(Client.projectData.start_date, Client.projectData.end_date)
+        let newDates = Client.goBackAYear(Client.projectData.start_date, Client.projectData.end_date)
         postToServer('/get-historical-weather', {
           lat : Client.projectData.lat,
           lon : Client.projectData.lon,

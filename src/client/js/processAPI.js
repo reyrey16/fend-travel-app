@@ -27,7 +27,6 @@ export function processCoordinates(data) {
 * @returns {boolean} false if API call was successful, otherwise false
 */
 export function processCurrentWeather(data) {
-
   // If API call is successful
   if (data.count > 0) {
     console.log("process current weather:", data)
@@ -66,7 +65,6 @@ export function processHistoricalWeather(data) {
     Client.projectData.temp = data.data[0].temp
     Client.projectData.avgMaxTemp = avgMaxTemp
     Client.projectData.avgMinTemp = avgMinTemp
-    Client.projectData.weatherAPI = "historical"
     
     document.getElementById('weatherHolder').innerHTML = `Typical weather for then is:<br> ${parseInt(Client.projectData.avgMaxTemp)}&deg; F, ${parseInt(Client.projectData.avgMinTemp)}&deg; F`
     return true
@@ -92,4 +90,25 @@ export function processPicture(data) {
     //document.getElementById('pictureHolder').alt = "Sorry, I couldn't find a picture of the destination"
     return false // Couldn't find a location specific or country picture
   }
+}
+
+/**
+* @description Returns the dates entered rolled back 365 days
+* @param {date} StartDate
+* @param {date} endDate
+* @returns {object} returns the newStartDate and newEndDate
+*/
+export function goBackAYear(start_date, end_date) {
+  // Manipulating the dates to go back a year
+  let startDate    = new Date(start_date)
+  let newStartDate = startDate.setDate(startDate.getDate() - 365)
+  newStartDate     = new Date(newStartDate).toISOString() // Convert to ISOString
+  newStartDate     = newStartDate.split("T", 1)[0] // Grab the date only
+
+  let endDate    = new Date(end_date)
+  let newEndDate = endDate.setDate(endDate.getDate() - 365)
+  newEndDate     = new Date(newEndDate).toISOString() // Convert to ISOString
+  newEndDate     = newEndDate.split("T", 1)[0] // Grab the date only
+
+  return {start_date: newStartDate, end_date: newEndDate}
 }

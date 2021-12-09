@@ -65,3 +65,30 @@ export function validateInput() {
   // If they all have something in them
   return true 
 }
+
+/**
+* @description Creates the daysCounter
+* @param {date} StartDate
+* @returns {number} returns the amount of days before the trip starts
+*/
+export function createDaysCounter(startDate) {
+  let startDateWithTime = new Date(startDate+"T00:00:00") // To ensure start date is at midnight
+  let today = new Date()
+  let daysCounter = (Date.parse(startDateWithTime) - today) / 86400000 // amount of milliseconds in a day
+  
+  return daysCounter
+}
+
+/**
+* @description Creates the tripCounter
+* @param {date} StartDate
+* @param {date} endDate
+* @returns {number} returns the total number of days the trip is
+*/
+export function createTripCounter(startDate, endDate) {
+  let startDateWithTime = new Date(startDate+"T00:00:00") // To ensure start date is at midnight
+  let endDateWithTime = new Date(endDate+"T00:00:00") // To ensure start date is at midnight
+  let tripCounter = (Date.parse(endDateWithTime) - Date.parse(startDateWithTime)) / 86400000 // amount of milliseconds in a day
+
+  return tripCounter
+}
