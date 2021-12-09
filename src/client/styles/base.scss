@@ -1,12 +1,24 @@
 /* IMPORTS */
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&family=Poppins&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins&display=swap');
+
+$h1Font: 'Dancing Script', sans-serif;
+$primaryFont: 'Poppins', serif;
+
+/* SCSS HEX */
+$indigo-dye: #08415cff;
+$light-cyan: #d0f4eaff;
+$carolina-blue: #5baad7ff;
+$marigold: #f1a208ff;
+$light-coral: #ef6f6cff;
 
 body{
-    font-family: 'Poppins', sans-serif;
+    font-family: $primaryFont;
     margin: 0;
 }
 
 #app{
     display: grid;
-    margin: 0 5%;
+    margin: 0;
+    grid-template-areas:
+    "head";
 }

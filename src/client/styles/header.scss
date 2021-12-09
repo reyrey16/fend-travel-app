@@ -1,0 +1,14 @@
+@import 'base';
+
+.headline {
+  grid-area: head;
+  text-align: center;
+  background-color: $carolina-blue;
+
+  h1 {
+      font-size: 3em;
+      margin: 20px 0;
+      font-family: $h1Font;
+      color: white;
+  }
+}
