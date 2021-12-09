@@ -36,18 +36,6 @@ function processCoordinates(data) {
     }
  }
 
- function listAllProperties(o) {
-  let objectToInspect = o;
-  let result = [];
-
-  while(objectToInspect !== null) {
-    result = result.concat(Object.getOwnPropertyNames(objectToInspect));
-    objectToInspect = Object.getPrototypeOf(objectToInspect)
-  }
-
-  return result;
-}
-
 function processCurrentWeather(data) {
     // If API call is successful
     if (data.count > 0) {
@@ -120,10 +108,8 @@ function processPicture(data) {
 }
 
 function displayResults(data) {
-
   displayDaysCounter(data.daysCounter)
   displayTripCounter(data.tripCounter)
-
 }
 
 function displayDaysCounter(daysCounter) {
@@ -162,63 +148,11 @@ function createTripCounter(startDate, endDate) {
   return tripCounter
 }
 
-function validateDates(startDate, endDate) {
-  let startDateWithTime = new Date(startDate+"T00:00:00") // To ensure start date is at midnight
-  let endDateWithTime = new Date(endDate+"T00:00:00") // To ensure start date is at midnight
-  let today = new Date()
-  let counterHolder = document.getElementById('counterHolder')
-
-  // validate the start date is >= to today
-  if (Date.parse(startDateWithTime) < today) {
-    counterHolder.innerHTML = "Your start date has to be after today, please choose another start date"
-    return false
-  } else if (Date.parse(endDateWithTime) < Date.parse(startDateWithTime)) {
-    counterHolder.innerHTML = "Your end date can't be before your start date. I haven't figured out how to time travel"
-    return false
-  }
-  // Dates are good
-  return true
-}
-
-function validateInput() {
-  // Validate that none of the 3 inputs are blank
-  let location = document.getElementById('location').value
-  let startDate = document.getElementById('startDate').value
-  let endDate = document.getElementById('endDate').value
-  let locationHolder = document.getElementById('locationHolder')
-
-  // validate that the inputs != blank
-  if (location == "") {
-    locationHolder.innerHTML = "Please enter a location"
-      return false
-  } else if (startDate == "") {
-    locationHolder.innerHTML = "Please enter a start date"
-    return false     
-  } else if (endDate == "") {
-    locationHolder.innerHTML = "Please enter an end date, sorry we can't vacation forever :)"
-    return false     
-  }
-  // If they all have something in them
-  return true 
-}
-
-function cleanAllFields() {
-  //Clean all inputs every time it runs, I am not designing it for multiple trips
-  projectData = {}
-  document.getElementById("pictureHolder").src = ""
-  document.getElementById("pictureHolder").alt = ""
-  document.getElementById("locationHolder").innerHTML = ""
-  document.getElementById("counterHolder").innerHTML = ""
-  document.getElementById("tripCounterHolder").innerHTML = ""
-  document.getElementById("weatherHolder").innerHTML = ""
-  document.getElementById("currentWeatherIcon").src = ""
-  document.getElementById('currentWeatherIcon').alt = ""
-}
-
 /* Function called by event listener */
 function processForm(e) {
   // Start with a clean slate, in case people try multiple locations
-  cleanAllFields()
+  Client.cleanAllFields()
+  projectData = {}
 
   // Grab the values of the 3 inputs
   let location = document.getElementById('location').value
@@ -226,10 +160,10 @@ function processForm(e) {
   let endDate = document.getElementById('endDate').value
 
   // validate that the inputs != blank
-  if (!validateInput()) { return false }
+  if (!Client.validateInput()) { return false }
 
   // validate that the dates are good
-  if (validateDates(startDate, endDate)) {
+  if (Client.validateDates(startDate, endDate)) {
     // TO DO : probably will go at the end with buildUI
     projectData.start_date = startDate
     projectData.end_date = endDate

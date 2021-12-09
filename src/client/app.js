@@ -1,8 +1,10 @@
 // Importing functions
 import { processForm } from './js/formHandler'
+import { cleanAllFields, validateInput, validateDates } from './js/validators'
 
 // Exporting so we can access via Client.NAME
 export { processForm }
+export { cleanAllFields, validateInput, validateDates }
 
 // Importing styles
 import './styles/base.scss'
