@@ -1,4 +1,4 @@
-let projectData = {}
+export let projectData = {}
 
 /* POST data to the server side */
 const postToServer = async (url = '', data = {}) => {
@@ -20,38 +20,6 @@ const postToServer = async (url = '', data = {}) => {
     }
 }
 
-function processCoordinates(data) {
-    // If API call is successfull
-    if (data.totalResultsCount > 0) {
-      // Assigning values into the global projectData object
-      projectData.destination = data.geonames[0].name
-      projectData.lon = data.geonames[0].lng
-      projectData.lat = data.geonames[0].lat
-      projectData.country = data.geonames[0].countryName
-      document.getElementById('locationHolder').innerHTML = projectData.destination
-      return true
-     } else {
-      document.getElementById('locationHolder').innerHTML = "Sorry, I couldn't find that location. It must be so exclusive that I haven't heard about it. Please try another location"
-      return false
-    }
- }
-
-function processCurrentWeather(data) {
-    // If API call is successful
-    if (data.count > 0) {
-      projectData.temp = data.data[0].temp
-      projectData.weatherDesc = data.data[0].weather.description
-      projectData.weatherIcon = "/images/" + data.data[0].weather.icon + ".png"
-      document.getElementById('currentWeatherIcon').src = projectData.weatherIcon
-      document.getElementById('weatherHolder').innerHTML = `Current weather: ${projectData.temp}&deg; F <br> ${projectData.weatherDesc}` 
-      return true
-    }
-    else {
-      document.getElementById('weatherHolder').innerHTML = "Sorry, I couldn't find the weather for that location"
-      return false
-    }
-}
-
 function goBackAYear(start_date, end_date) {
     // Manipulating the dates to go back a year
     let startDate    = new Date(start_date)
@@ -65,46 +33,6 @@ function goBackAYear(start_date, end_date) {
     newEndDate     = newEndDate.split("T", 1)[0] // Grab the date only
 
     return {start_date: newStartDate, end_date: newEndDate}
-}
-
-function processHistoricalWeather(data) {
-    // If API call is successfull
-    // If data.data exists, proper response is received from API
-    if (data.data) {
-      // Calculating average temps
-      let maxTemp = 0
-      let minTemp = 0
-      data.data.forEach((day, index, array) => {
-        maxTemp += day.max_temp
-        minTemp += day.min_temp
-      })
-      let avgMaxTemp = maxTemp / data.data.length
-      let avgMinTemp = minTemp / data.data.length
-
-      projectData.temp = data.data[0].temp
-      projectData.avgMaxTemp = avgMaxTemp
-      projectData.avgMinTemp = avgMinTemp
-      projectData.weatherAPI = "historical"
-      
-      document.getElementById('weatherHolder').innerHTML = `Typical weather for then is:<br> ${parseInt(projectData.avgMaxTemp)}&deg; F, ${parseInt(projectData.avgMinTemp)}&deg; F`
-      return true
-    }  else {
-      document.getElementById('weatherHolder').innerHTML = "Sorry, I couldn't find the weather for that location"
-      return false
-    }
-}
-
-function processPicture(data) {
-    // If API call is successful
-    if (data.total > 0) {
-      projectData.picture = data.hits[0].webformatURL
-      document.getElementById('pictureHolder').src = projectData.picture
-      return true
-    } else {
-      document.getElementById('pictureHolder').src = ""
-      //document.getElementById('pictureHolder').alt = "Sorry, I couldn't find a picture of the destination"
-      return false // Couldn't find a location specific or country picture
-    }
 }
 
 function displayResults(data) {
@@ -125,7 +53,7 @@ function displayDaysCounter(daysCounter) {
 }
 
 function displayTripCounter(tripCounter) {
-  if (parseInt(tripCounter) == 1) {
+  if (parseInt(tripCounter) == 0) {
     document.getElementById('tripCounterHolder').innerHTML = "day trip"
   } else {
     document.getElementById('tripCounterHolder').innerHTML = parseInt(tripCounter) + " day trip"
@@ -149,10 +77,9 @@ function createTripCounter(startDate, endDate) {
 }
 
 /* Function called by event listener */
-function processForm(e) {
+export function processForm(e) {
   // Start with a clean slate, in case people try multiple locations
   Client.cleanAllFields()
-  projectData = {}
 
   // Grab the values of the 3 inputs
   let location = document.getElementById('location').value
@@ -165,10 +92,10 @@ function processForm(e) {
   // validate that the dates are good
   if (Client.validateDates(startDate, endDate)) {
     // TO DO : probably will go at the end with buildUI
-    projectData.start_date = startDate
-    projectData.end_date = endDate
-    projectData.daysCounter = createDaysCounter(startDate)
-    projectData.tripCounter = createTripCounter(startDate, endDate)
+    Client.projectData.start_date = startDate
+    Client.projectData.end_date = endDate
+    Client.projectData.daysCounter = createDaysCounter(startDate)
+    Client.projectData.tripCounter = createTripCounter(startDate, endDate)
   } else {
     return false
   }
@@ -179,7 +106,7 @@ function processForm(e) {
   postToServer('/post-location', {location:location})
   // Process GeoNames API response        
   .then((data) => {
-    if(!processCoordinates(data)) {
+    if(!Client.processCoordinates(data)) {
       throw new Error("Couldn't find location")
     }
     return true
@@ -188,16 +115,17 @@ function processForm(e) {
   // 2. Check date to determine correct weather API
   .then((data) => {
     return new Promise((resolve, reject) => {
+      console.log("CURRENT Client.projectData:", Client.projectData)
       // If start date is within a week, call the Current Weather API 
-      if (projectData.daysCounter < 7) {
+      if (Client.projectData.daysCounter < 7) {
         document.getElementById('weatherHolder').innerHTML = "Searching for the current weather"
         postToServer('/get-current-weather', {
-          lat : projectData.lat,
-          lon : projectData.lon
+          lat : Client.projectData.lat,
+          lon : Client.projectData.lon
         })
         // Process current weather API response        
         .then((data) => {
-          if (processCurrentWeather(data)) {
+          if (Client.processCurrentWeather(data)) {
             resolve("SUCCESS")
           } else {
             reject("Couldn't process current weather API data")
@@ -212,16 +140,16 @@ function processForm(e) {
         // If start date is after a week, call the historical Weather API
         document.getElementById('weatherHolder').innerHTML = "Searching for the historical weather"
         // Generate new dates since the API relies on previous dates 
-        let newDates = goBackAYear(projectData.start_date, projectData.end_date)
+        let newDates = goBackAYear(Client.projectData.start_date, Client.projectData.end_date)
         postToServer('/get-historical-weather', {
-          lat : projectData.lat,
-          lon : projectData.lon,
+          lat : Client.projectData.lat,
+          lon : Client.projectData.lon,
           start_date : newDates.start_date,
           end_date : newDates.end_date
         })
         // Process historical weather API response        
         .then((data) => {
-          if (processHistoricalWeather(data)) {
+          if (Client.processHistoricalWeather(data)) {
             resolve("SUCCESS")
           } else {
             reject("Couldn't process historical weather API data")
@@ -239,16 +167,16 @@ function processForm(e) {
   .then(() => {
     return new Promise((resolve, reject) => {
       document.getElementById('pictureHolder').alt = "Searching for a picture of the location"
-      postToServer('/get-picture', {location : projectData.destination})
+      postToServer('/get-picture', {location : Client.projectData.destination})
 
       // Process Pixabay API response        
       .then((data) => {
         // If false, try country search
-        if (!processPicture(data)) {
-          postToServer('/get-picture', {location : projectData.country})
+        if (!Client.processPicture(data)) {
+          postToServer('/get-picture', {location : Client.projectData.country})
           // Results of country picture search
           .then((data) => {
-            if (processPicture(data)) {
+            if (Client.processPicture(data)) {
               resolve("SUCCESS")
             } else {
               reject("Couldn't process historical weather API data")
@@ -267,7 +195,7 @@ function processForm(e) {
 
   // If I got here, all the APIs are done and successfull, time to build the UI
   .then(() => {
-    displayResults(projectData)
+    displayResults(Client.projectData)
   })
 
   // Catch any errors in the chain
@@ -278,6 +206,3 @@ function processForm(e) {
 
 // Event listener to add function to existing HTML DOM element
 document.getElementById('generate').addEventListener('click', processForm)
-
-// EXPORTS
-export { processForm }

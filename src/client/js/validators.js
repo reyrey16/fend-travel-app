@@ -5,6 +5,7 @@
 */
 export function cleanAllFields() {
   //Clean all inputs every time it runs, I am not designing it for multiple trips
+  Client.projectData = {}
   document.getElementById("pictureHolder").src = ""
   document.getElementById("pictureHolder").alt = ""
   document.getElementById("locationHolder").innerHTML = ""
