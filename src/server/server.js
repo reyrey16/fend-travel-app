@@ -82,11 +82,6 @@ app.post('/get-historical-weather', function (req, res) {
   // figure out with the API docs how to specify a specific date in the 
   // future. I feel this way is more accurate.
 
-
-
-  console.log("START DATE:", req.body.start_date)
-  console.log("END DATE:", req.body.end_date)
-
   // Preparing the URL for WeatherBit API
   const baseURL = "https://api.weatherbit.io/v2.0/history/daily?"
   let lat = "lat=" + req.body.lat
