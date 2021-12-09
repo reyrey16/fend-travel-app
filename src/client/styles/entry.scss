@@ -1,0 +1,32 @@
+@import 'base';
+
+.entry {
+  grid-area: entry;
+  margin-top: 50px;
+
+  #pictureHolder {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  .title {
+    font-size: 2em;
+    text-align: center;
+    background-color: $carolina-blue;
+    color: white;
+    padding: 10px 0;
+    margin-bottom: 20px;
+  }
+
+  p {
+    margin-left: 5%;
+    font-size: 1.25em;
+    padding: 5px 0;
+  }
+
+  #weatherHolder {
+    padding: 25px 0;
+    line-height: 1.5;
+  }
+
+}

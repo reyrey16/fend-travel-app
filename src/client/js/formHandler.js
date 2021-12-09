@@ -213,7 +213,7 @@ document.getElementById('generate').addEventListener('click', processForm)
      "temp": 56.1, 
      "avgMaxTemp": 65.9875,
      "avgMinTemp": 41.1875,
-     //"picture": "https://cdn.pixabay.com/photo/2016/11/20/09/12/architecture-1842324_960_720.jpg",
+     "picture": "https://cdn.pixabay.com/photo/2016/11/20/09/12/architecture-1842324_960_720.jpg",
      "temp": 56.1
    }
 
