@@ -33,8 +33,7 @@ export function processCurrentWeather(data) {
     Client.projectData.temp = data.data[0].temp
     Client.projectData.weatherDesc = data.data[0].weather.description
     Client.projectData.weatherIcon = "/images/" + data.data[0].weather.icon + ".png"
-    document.getElementById('currentWeatherIcon').src = Client.projectData.weatherIcon
-    document.getElementById('weatherHolder').innerHTML = `Current weather: ${Client.projectData.temp}&deg; F <br> ${Client.projectData.weatherDesc}` 
+    Client.projectData.weatherType = "current" 
     return true
   }
   else {
@@ -65,8 +64,7 @@ export function processHistoricalWeather(data) {
     Client.projectData.temp = data.data[0].temp
     Client.projectData.avgMaxTemp = avgMaxTemp
     Client.projectData.avgMinTemp = avgMinTemp
-    
-    document.getElementById('weatherHolder').innerHTML = `Typical weather for then is:<br> ${parseInt(Client.projectData.avgMaxTemp)}&deg; F, ${parseInt(Client.projectData.avgMinTemp)}&deg; F`
+    Client.projectData.weatherType = "historical"
     return true
   }  else {
     document.getElementById('weatherHolder').innerHTML = "Sorry, I couldn't find the weather for that location"
@@ -83,11 +81,10 @@ export function processPicture(data) {
   // If API call is successful
   if (data.total > 0) {
     Client.projectData.picture = data.hits[0].webformatURL
-    document.getElementById('pictureHolder').src = Client.projectData.picture
     return true
   } else {
     document.getElementById('pictureHolder').src = ""
-    //document.getElementById('pictureHolder').alt = "Sorry, I couldn't find a picture of the destination"
+    document.getElementById('pictureHolder').alt = "Sorry, I couldn't find a picture of the destination"
     return false // Couldn't find a location specific or country picture
   }
 }
