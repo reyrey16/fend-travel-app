@@ -23,7 +23,7 @@ app.use(cors());
 app.use(express.static('dist'));
 
 // Setup Server
-const port = 3001;
+const port = 3005;
 const server = app.listen(port, () => {
   console.log("Server is alive!! Port " + port);
 });
@@ -140,3 +140,5 @@ const getPicture = async (URL) => {
     console.log("Pixabay API Error:", error)
   }
 }
+
+module.exports = app

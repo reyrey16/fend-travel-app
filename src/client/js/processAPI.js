@@ -6,7 +6,7 @@
 * @returns {boolean} false if API call was successful, otherwise false
 */
 export function processCoordinates(data) {
-  // If API call is successfull
+  // If API call is successful
   if (data.totalResultsCount > 0) {
     // Assigning values into the global Client.projectData object
     Client.projectData.destination = data.geonames[0].name
@@ -28,7 +28,6 @@ export function processCoordinates(data) {
 export function processCurrentWeather(data) {
   // If API call is successful
   if (data.count > 0) {
-    console.log("process current weather:", data)
     Client.projectData.temp = data.data[0].temp
     Client.projectData.weatherDesc = data.data[0].weather.description
     Client.projectData.weatherIcon = "/images/" + data.data[0].weather.icon + ".png"

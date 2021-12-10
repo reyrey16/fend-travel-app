@@ -17,6 +17,7 @@ const postToServer = async (url = '', data = {}) => {
       const newData = await response.json();
       return newData;
     } catch (error) {
+      document.getElementById('locationHolder').innerHTML = "Seems like you may not be connected to the internet, please check your internet connection and try again"
       console.log("POST ERROR:", error);
     }
 }
@@ -67,9 +68,6 @@ function displayResults(data) {
 
   // Display the title
   document.getElementById('entry').style.display = "block"
-
-
-  console.log(data)
 }
 
 /* Function called by event listener */
@@ -111,7 +109,6 @@ export function processForm(e) {
   // 2. Check date to determine correct weather API
   .then((data) => {
     return new Promise((resolve, reject) => {
-      console.log("CURRENT Client.projectData:", Client.projectData)
       // If start date is within a week, call the Current Weather API 
       if (Client.projectData.daysCounter < 7) {
         document.getElementById('weatherHolder').innerHTML = "Searching for the current weather"
