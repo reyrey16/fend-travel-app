@@ -24,3 +24,34 @@ body{
     "main"
     "entry";
 }
+
+@media(min-width: 901px) {
+    #app{
+      grid-template-columns: repeat(9, 1fr);
+      grid-template-rows: auto;
+      grid-template-areas:
+      "head head head head head head head head head"
+      ". . . main main main . . ."
+      ". . entry entry entry entry entry . .";
+    }
+
+    #entryHolder {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+        grid-template-areas:
+        "picture details"
+        "picture details";
+    }
+
+    #pictureHolder {
+        grid-area: picture;
+    }
+
+    #detailsDiv {
+        grid-area: details;
+        font-size: 1.5em;
+    }
+
+
+}

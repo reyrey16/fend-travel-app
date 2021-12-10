@@ -202,23 +202,3 @@ export function processForm(e) {
 
 // Event listener to add function to existing HTML DOM element
 document.getElementById('generate').addEventListener('click', processForm)
-
-  // TEST DATA FOR MAKING IT PRETTY
-   let testData = { 
-    "start_date": "2022-01-04", 
-    "end_date": "2022-01-12", 
-    "daysCounter": 225.652029525462964, 
-    "tripCounter": 824, 
-    "destination": "Walt Disney World", 
-    "weatherType": "historical",
-    "lon": "-81.58257", 
-    "lat": "28.41167", 
-    "country": "United States", 
-    "temp": 56.1, 
-    "avgMaxTemp": 65.9875,
-    "avgMinTemp": 41.1875,
-    "picture": "https://cdn.pixabay.com/photo/2016/11/20/09/12/architecture-1842324_960_720.jpg",
-    "temp": 56.1
-   }
-
-   displayResults(testData)

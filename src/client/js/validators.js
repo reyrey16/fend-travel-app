@@ -10,7 +10,6 @@ export function cleanAllFields() {
   document.getElementById("pictureHolder").alt = ""
   document.getElementById("locationHolder").innerHTML = ""
   document.getElementById("counterHolder").innerHTML = ""
-  document.getElementById("tripCounterHolder").innerHTML = ""
   document.getElementById("weatherHolder").innerHTML = ""
   document.getElementById("currentWeatherIcon").src = ""
   document.getElementById('currentWeatherIcon').alt = ""
