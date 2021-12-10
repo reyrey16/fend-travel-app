@@ -6,19 +6,6 @@
   margin: 20px;
 
   
-
-  .dates {
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: space-between;
-    align-items: stretch;
-  }
-
-  label {
-    margin: 10px 0;
-    display: block;
-  }
-
   input {
     display: block;
     width: 100%;
@@ -26,7 +13,15 @@
     height: 35px;
     margin: 10px 0;
     font-size: 15px;
+    margin-right: 5%;
   }
+
+  .dates {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+  }
+
 
   @mixin button-bg($bg) {
     background: $bg;

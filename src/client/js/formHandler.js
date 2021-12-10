@@ -23,32 +23,32 @@ const postToServer = async (url = '', data = {}) => {
 
 // Helper functions to display the output
 function displayDaysCounter(daysCounter) {
-  let counterHolder = document.getElementById('counterHolder')
-
   if (daysCounter < 1) {
-    counterHolder.innerHTML = parseInt(daysCounter / 3600000) + " hours left"  // amount of milliseconds in an hour
+    return parseInt(daysCounter / 3600000) + " hours left"  // amount of milliseconds in an hour
   } else if (parseInt(daysCounter) == 1) {
-    counterHolder.innerHTML = parseInt(daysCounter) + " day left"
+    return parseInt(daysCounter) + " day left"
   } else {
-    counterHolder.innerHTML = parseInt(daysCounter) + " days left"
+    return parseInt(daysCounter) + " days left"
   }
 }
 
 function displayTripCounter(tripCounter) {
   if (parseInt(tripCounter) == 0) {
-    document.getElementById('tripCounterHolder').innerHTML = "day trip"
+    return ",day trip"
   } else {
-    document.getElementById('tripCounterHolder').innerHTML = parseInt(tripCounter) + " day trip"
+    return ", " + parseInt(tripCounter) + " day trip"
   }
 }
 
 function displayResults(data) {
   // Display the destination
-  document.getElementById('locationHolder').innerHTML = data.destination
+  document.getElementById('locationHolder').innerHTML = `${data.destination}, ${data.country}`
   
-  // Display the counters
-  displayDaysCounter(data.daysCounter)
-  displayTripCounter(data.tripCounter)
+  // Gather the counter data
+  let counterHolder = displayDaysCounter(data.daysCounter)
+  counterHolder += displayTripCounter(data.tripCounter)
+  document.getElementById('counterHolder').innerHTML = counterHolder
+
 
   // Display the weather
   if (data.weatherType == "current") {
@@ -64,6 +64,10 @@ function displayResults(data) {
   if(data.picture) {
     document.getElementById('pictureHolder').src = data.picture
   }
+
+  // Display the title
+  document.getElementById('entry').style.display = "block"
+
 
   console.log(data)
 }
@@ -201,20 +205,20 @@ document.getElementById('generate').addEventListener('click', processForm)
 
   // TEST DATA FOR MAKING IT PRETTY
    let testData = { 
-     "start_date": "2022-01-04", 
-   "end_date": "2022-01-12", 
-   "daysCounter": 25.652029525462964, 
-   "tripCounter": 8, 
-     "destination": "Walt Disney World", 
-  "weatherType": "historical",
-     "lon": "-81.58257", 
-     "lat": "28.41167", 
-     "country": "United States", 
-     "temp": 56.1, 
-     "avgMaxTemp": 65.9875,
-     "avgMinTemp": 41.1875,
-     "picture": "https://cdn.pixabay.com/photo/2016/11/20/09/12/architecture-1842324_960_720.jpg",
-     "temp": 56.1
+    "start_date": "2022-01-04", 
+    "end_date": "2022-01-12", 
+    "daysCounter": 225.652029525462964, 
+    "tripCounter": 824, 
+    "destination": "Walt Disney World", 
+    "weatherType": "historical",
+    "lon": "-81.58257", 
+    "lat": "28.41167", 
+    "country": "United States", 
+    "temp": 56.1, 
+    "avgMaxTemp": 65.9875,
+    "avgMinTemp": 41.1875,
+    "picture": "https://cdn.pixabay.com/photo/2016/11/20/09/12/architecture-1842324_960_720.jpg",
+    "temp": 56.1
    }
 
    displayResults(testData)
